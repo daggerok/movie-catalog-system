@@ -1,0 +1,112 @@
+name: CI
+on: [push]
+jobs:
+
+  build:
+    strategy:
+      matrix:
+        java: [11]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    name: java-${{ matrix.java }} build
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-java-${{ hashFiles('**/mvnw') }}
+        restore-keys: |
+          ${{ runner.os }}-java-
+          ${{ runner.os }}-node-
+          ${{ runner.os }}-npm-
+          ${{ runner.os }}-
+    - uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - run: sudo apt-get install -y curl
+    - run: sudo npm i -g wait-port
+    - run: cd $GITHUB_WORKSPACE && ./gradlew
+
+  movie-catalog:
+    strategy:
+      matrix:
+        java: [11]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    name: java-${{ matrix.java }} movie-catalog
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-java-${{ hashFiles('**/mvnw') }}
+        restore-keys: |
+          ${{ runner.os }}-java-
+          ${{ runner.os }}-node-
+          ${{ runner.os }}-npm-
+          ${{ runner.os }}-
+    - uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - run: sudo apt-get install -y curl
+    - run: sudo npm i -g wait-port
+    - run: cd $GITHUB_WORKSPACE && ./gradlew -p movie-catalog
+    - run: bash $GITHUB_WORKSPACE/movie-catalog/build/libs/*jar &
+    - run: wait-port 8080
+    - run: curl 0:8080
+
+  movie-details:
+    strategy:
+      matrix:
+        java: [11]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    name: java-${{ matrix.java }} movie-details
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-java-${{ hashFiles('**/mvnw') }}
+        restore-keys: |
+          ${{ runner.os }}-java-
+          ${{ runner.os }}-node-
+          ${{ runner.os }}-npm-
+          ${{ runner.os }}-
+    - uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - run: sudo apt-get install -y curl
+    - run: sudo npm i -g wait-port
+    - run: cd $GITHUB_WORKSPACE && ./gradlew -p movie-details
+    - run: bash $GITHUB_WORKSPACE/movie-details/build/libs/*jar &
+    - run: wait-port 8001
+    - run: curl 0:8001
+
+  movie-ratings:
+    strategy:
+      matrix:
+        java: [11]
+        os: [ubuntu-latest]
+    runs-on: ${{ matrix.os }}
+    name: java-${{ matrix.java }} movie-ratings
+    steps:
+    - uses: actions/checkout@v1
+    - uses: actions/cache@v1
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-java-${{ hashFiles('**/mvnw') }}
+        restore-keys: |
+          ${{ runner.os }}-java-
+          ${{ runner.os }}-node-
+          ${{ runner.os }}-npm-
+          ${{ runner.os }}-
+    - uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - run: sudo apt-get install -y curl
+    - run: sudo npm i -g wait-port
+    - run: cd $GITHUB_WORKSPACE && ./gradlew -p movie-ratings
+    - run: bash $GITHUB_WORKSPACE/movie-ratings/build/libs/*jar &
+    - run: wait-port 8002
+    - run: curl 0:8002
